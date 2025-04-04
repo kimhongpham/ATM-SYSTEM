@@ -113,13 +113,13 @@ public class TransferUI extends JFrame {
 
                     // Call the API (replace with actual API call)
                     boolean success = callTransferAPI(receiverAccountNumber, transferAmount);
-                    if (success) {
-                        JOptionPane.showMessageDialog(null, "Transfer successful!", "Success", JOptionPane.INFORMATION_MESSAGE);
-                        new TransactionsUI(accountNumber,authToken).setVisible(true);
-                        dispose();
-                    } else {
-                        JOptionPane.showMessageDialog(null, "Transfer failed. Please try again.", "Error", JOptionPane.ERROR_MESSAGE);
-                    }
+//                    if (success) {
+//                        JOptionPane.showMessageDialog(null, "Transfer successful!", "Success", JOptionPane.INFORMATION_MESSAGE);
+//                        new TransactionsUI(accountNumber,authToken).setVisible(true);
+//                        dispose();
+//                    } else {
+//                        JOptionPane.showMessageDialog(null, "Transfer failed. Please try again.", "Error", JOptionPane.ERROR_MESSAGE);
+//                    }
 
                 } catch (NumberFormatException ex) {
                     JOptionPane.showMessageDialog(null, "Invalid amount. Please enter a number.", "Error", JOptionPane.ERROR_MESSAGE);
@@ -161,19 +161,21 @@ public class TransferUI extends JFrame {
                 String formattedBalance = df.format(balanceValue);
 
                 JOptionPane.showMessageDialog(null, message + " New Balance: " + formattedBalance, "Success", JOptionPane.INFORMATION_MESSAGE);
+                new TransactionsUI(accountNumber,authToken).setVisible(true);
+                dispose();
                 return true;
             } else {
                 // Xử lý lỗi từ backend
                 BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getErrorStream(), "utf-8"));
-                StringBuilder errorResponse = new StringBuilder();
+                StringBuilder Response = new StringBuilder();
                 String line;
                 while ((line = reader.readLine()) != null) {
-                    errorResponse.append(line.trim());
+                    Response.append(line.trim());
                 }
-                JSONObject errorBody = new JSONObject(errorResponse.toString());
-                String errorMessage = errorBody.getString("message");
+                JSONObject Body = new JSONObject(Response.toString());
+                String Message = Body.getString("message");
 
-                JOptionPane.showMessageDialog(null, errorMessage, "Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(null, Message, "Success", JOptionPane.INFORMATION_MESSAGE);
                 return false;
             }
         } catch (Exception e) {

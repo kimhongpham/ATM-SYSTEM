@@ -38,13 +38,9 @@ public class DepositUI extends JFrame {
         tf1.setFont(new Font("Arial", Font.BOLD, 24));
 
         b1 = new JButton("Exit");
-        b1.setBackground(Color.BLACK);
-        b1.setForeground(Color.BLACK);
         b1.setFont(new Font("Arial", Font.BOLD, 24));
 
         b2 = new JButton("Deposit");
-        b2.setBackground(Color.BLACK);
-        b2.setForeground(Color.BLACK);
         b2.setFont(new Font("Arial", Font.BOLD, 24));
     }
 
@@ -138,7 +134,7 @@ public class DepositUI extends JFrame {
                         JOptionPane.showMessageDialog(null, message + " New Balance: " + formattedBalance, "Success", JOptionPane.INFORMATION_MESSAGE);
                         navigateToTransactions(); // Điều hướng sau khi nạp tiền thành công
                     } else {
-                        handleErrorResponse(conn);
+                        handleResponse(conn);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -152,22 +148,22 @@ public class DepositUI extends JFrame {
         }
     }
 
-    private void handleErrorResponse(HttpURLConnection conn) {
+    private void handleResponse(HttpURLConnection conn) {
         try {
             BufferedReader br = new BufferedReader(new InputStreamReader(conn.getErrorStream()));
-            StringBuilder errorResponse = new StringBuilder();
+            StringBuilder Response = new StringBuilder();
             String output;
 
             while ((output = br.readLine()) != null) {
-                errorResponse.append(output);
+                Response.append(output);
             }
             br.close();
 
             // Parse thông báo lỗi từ backend
-            JSONObject errorResponseBody = new JSONObject(errorResponse.toString());
-            String errorMessage = errorResponseBody.getString("message");
+            JSONObject ResponseBody = new JSONObject(Response.toString());
+            String Message = ResponseBody.getString("message");
 
-            JOptionPane.showMessageDialog(null, errorMessage, "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, Message, "Success", JOptionPane.INFORMATION_MESSAGE);
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null, "Failed to read error response from server. Please try again later.", "Error", JOptionPane.ERROR_MESSAGE);
         }

@@ -113,7 +113,10 @@ public class TransactionConfirmationUI extends JFrame {
                         message + " New Balance: " + df.format(balanceValue),
                         "Success",
                         JOptionPane.INFORMATION_MESSAGE
+
                 );
+                new TransactionsUI(accountNumber,authToken).setVisible(true);
+                dispose();
             } else {
                 // Xử lý các phản hồi không thành công
                 handleErrorResponse(response);
@@ -165,9 +168,11 @@ public class TransactionConfirmationUI extends JFrame {
             JOptionPane.showMessageDialog(
                     this,
                     errorMessage,
-                    "Error",
-                    JOptionPane.ERROR_MESSAGE
+                    "Success",
+                    JOptionPane.INFORMATION_MESSAGE
             );
+            new TransactionsUI(accountNumber,authToken).setVisible(true);
+            dispose();
         } catch (Exception parseException) {
             // Xử lý lỗi khi không thể parse thông báo lỗi
             JOptionPane.showMessageDialog(
