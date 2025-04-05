@@ -137,7 +137,13 @@ public class LoginUI extends JFrame {
 
                 JOptionPane.showMessageDialog(null, "Login Successful!");
 
-                new TransactionsUI(accountNumber, authToken).setVisible(true); // Truyền token
+
+
+                //Hiển thị UI theo role
+                if (jsonResponse.getString("role").equals("ADMIN")) {
+                    new AdminMenu(accountNumber,authToken).setVisible(true);
+                }else new TransactionsUI(accountNumber, authToken).setVisible(true); // Truyền token
+
                 dispose();
             } else {
                 JOptionPane.showMessageDialog(null, "Invalid Account Number or PIN", "Login Failed", JOptionPane.ERROR_MESSAGE);

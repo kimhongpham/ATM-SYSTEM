@@ -4,12 +4,12 @@ public class WithdrawOtpRequest {
     private String accountNumber;
 //    private String phoneNumber;
     private String otp;
-    private Double amount;
+    private Long amount;
 
     // Constructor mặc định hoặc có tham số
     public WithdrawOtpRequest() {}
 
-    public WithdrawOtpRequest(String accountNumber, String phoneNumber, String otp, double amount) {
+    public WithdrawOtpRequest(String accountNumber, String phoneNumber, String otp, Long amount) {
         this.accountNumber = accountNumber;
 //        this.phoneNumber = phoneNumber;
         this.otp = otp;
@@ -41,11 +41,11 @@ public class WithdrawOtpRequest {
         this.otp = otp;
     }
 
-    public Double getAmount() {
+    public Long getAmount() {
         return amount;
     }
 
-    public void setAmount(Double amount) {
+    public void setAmount(Long amount) {
         this.amount = amount;
     }
 }

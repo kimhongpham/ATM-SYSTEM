@@ -48,10 +48,15 @@ public class TransactionController {
         String pin = loginRequest.get("pin");
 
         String token = transactionService.login(accountNumber, pin);
+        // Truyền thêm role của account để vào màn hình cài đặt ATM
+        Account account = accountService.getAccountById(accountNumber);
+
+
         if (token != null) {
             Map<String, String> response = Map.of(
                     "message", "Login successful",
-                    "token", token
+                    "token", token,
+                    "role", account.getRole()
             );
             return ResponseEntity.ok(response);
         } else {
