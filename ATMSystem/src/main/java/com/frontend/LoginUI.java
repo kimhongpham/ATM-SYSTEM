@@ -48,9 +48,9 @@ public class LoginUI extends JFrame {
 
         btnClear = new JButton("Clear");
         btnClear.setFont(new Font("Arial", Font.BOLD, 20));
-
-        btnOTP = new JButton("Withdraw by OTP");
-        btnOTP.setFont(new Font("Arial", Font.BOLD, 20));
+//
+//        btnOTP = new JButton("Withdraw by OTP");
+//        btnOTP.setFont(new Font("Arial", Font.BOLD, 20));
     }
 
     private void addComponentsToFrame() {
@@ -71,14 +71,14 @@ public class LoginUI extends JFrame {
         passwordText.setBounds(375, 270, 230, 40);
         add(passwordText);
 
-        btnSignIn.setBounds(175, 350, 150, 50);
+        btnSignIn.setBounds(175, 400, 150, 50);
         add(btnSignIn);
 
-        btnClear.setBounds(375, 350, 150, 50);
+        btnClear.setBounds(375, 400, 150, 50);
         add(btnClear);
 
-        btnOTP.setBounds(200, 420, 300, 50);
-        add(btnOTP);
+//        btnOTP.setBounds(200, 420, 300, 50);
+//        add(btnOTP);
     }
 
     private void addActionListeners() {
@@ -93,14 +93,14 @@ public class LoginUI extends JFrame {
                 clearFields();
             }
         });
-        btnOTP.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent ae) {
-
-                new SendOTPUI().setVisible(true);
-                dispose();
-
-            }
-        });
+//        btnOTP.addActionListener(new ActionListener() {
+//            public void actionPerformed(ActionEvent ae) {
+//
+//                new SendOTPUI().setVisible(true);
+//                dispose();
+//
+//            }
+//        });
     }
 
     private void handleLogin() {

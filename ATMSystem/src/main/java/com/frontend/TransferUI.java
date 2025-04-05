@@ -113,13 +113,14 @@ public class TransferUI extends JFrame {
 
                     // Call the API (replace with actual API call)
                     boolean success = callTransferAPI(receiverAccountNumber, transferAmount);
-                    if (success) {
-                        JOptionPane.showMessageDialog(null, "Transfer successful!", "Success", JOptionPane.INFORMATION_MESSAGE);
-                        new TransactionsUI(accountNumber,authToken).setVisible(true);
-                        dispose();
-                    } else {
-                        JOptionPane.showMessageDialog(null, "Transfer failed. Please try again.", "Error", JOptionPane.ERROR_MESSAGE);
-                    }
+//                    if (success) {
+//                        JOptionPane.showMessageDialog(null, "Transfer successful!", "Success", JOptionPane.INFORMATION_MESSAGE);
+//                        new TransactionsUI(accountNumber,authToken).setVisible(true);
+//                        dispose();
+//                    }
+//                    else {
+//                        JOptionPane.showMessageDialog(null, "Transfer failed. Please try again.", "Error", JOptionPane.ERROR_MESSAGE);
+//                    }
 
                 } catch (NumberFormatException ex) {
                     JOptionPane.showMessageDialog(null, "Invalid amount. Please enter a number.", "Error", JOptionPane.ERROR_MESSAGE);
@@ -132,54 +133,89 @@ public class TransferUI extends JFrame {
             String apiUrl = "http://localhost:8080/api/transactions/transfer";
             URL url = new URL(apiUrl);
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+
+            // Cấu hình HTTP Request
             connection.setRequestMethod("POST");
             connection.setRequestProperty("Content-Type", "application/json");
             connection.setRequestProperty("Authorization", "Bearer " + authToken);
             connection.setDoOutput(true);
 
-            String jsonPayload = String.format("{\"targetAccountNumber\": \"%s\", \"amount\": %.2f}", targetAccountNumber, amount);
+            // Tạo JSON payload
+            JSONObject jsonPayload = new JSONObject();
+            jsonPayload.put("targetAccountNumber", targetAccountNumber);
+            jsonPayload.put("amount", amount);
+
+            // Gửi JSON payload
             try (OutputStream os = connection.getOutputStream()) {
-                os.write(jsonPayload.getBytes("utf-8"));
+                os.write(jsonPayload.toString().getBytes("UTF-8"));
             }
 
+            // Kiểm tra mã phản hồi từ server
             int responseCode = connection.getResponseCode();
             if (responseCode == HttpURLConnection.HTTP_OK) {
-                BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream(), "utf-8"));
-                StringBuilder response = new StringBuilder();
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    response.append(line.trim());
-                }
-                System.out.println("Success Response: " + response.toString());
-                JSONObject responseBody = new JSONObject(response.toString());
-                String message = responseBody.getString("message");
-                String balance = responseBody.getString("data");
-
-                // Định dạng số liệu
-                double balanceValue = Double.parseDouble(balance);
-                DecimalFormat df = new DecimalFormat("#,##0.00");
-                String formattedBalance = df.format(balanceValue);
-
-                JOptionPane.showMessageDialog(null, message + " New Balance: " + formattedBalance, "Success", JOptionPane.INFORMATION_MESSAGE);
-                return true;
+                return handleSuccessResponse(connection);
             } else {
-                // Xử lý lỗi từ backend
-                BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getErrorStream(), "utf-8"));
-                StringBuilder errorResponse = new StringBuilder();
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    errorResponse.append(line.trim());
-                }
-                JSONObject errorBody = new JSONObject(errorResponse.toString());
-                String errorMessage = errorBody.getString("message");
-
-                JOptionPane.showMessageDialog(null, errorMessage, "Error", JOptionPane.ERROR_MESSAGE);
-                return false;
+                return handleErrorResponse(connection);
             }
         } catch (Exception e) {
             e.printStackTrace();
-            JOptionPane.showMessageDialog(null, "Error processing transfer! Please try again later.", "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, "Đã xảy ra lỗi khi xử lý chuyển khoản! Vui lòng thử lại sau.", "Error", JOptionPane.ERROR_MESSAGE);
             return false;
         }
     }
+
+    // Phương thức xử lý phản hồi thành công
+    private boolean handleSuccessResponse(HttpURLConnection connection) {
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream(), "UTF-8"))) {
+            StringBuilder response = new StringBuilder();
+            String line;
+            while ((line = reader.readLine()) != null) {
+                response.append(line.trim());
+            }
+
+            System.out.println("Success Response: " + response.toString());
+            JSONObject responseBody = new JSONObject(response.toString());
+            String message = responseBody.getString("message");
+            String balance = responseBody.getString("data");
+
+            // Định dạng số liệu
+            double balanceValue = Double.parseDouble(balance);
+            DecimalFormat df = new DecimalFormat("#,##0.00");
+            String formattedBalance = df.format(balanceValue);
+
+            // Hiển thị thông báo thành công
+            JOptionPane.showMessageDialog(null, message + " Số dư mới: " + formattedBalance, "Success", JOptionPane.INFORMATION_MESSAGE);
+            new TransactionsUI(accountNumber, authToken).setVisible(true);
+            dispose();
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(null, "Đã xảy ra lỗi khi xử lý phản hồi thành công.", "Error", JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
+    }
+
+    // Phương thức xử lý phản hồi lỗi
+    private boolean handleErrorResponse(HttpURLConnection connection) {
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getErrorStream(), "UTF-8"))) {
+            StringBuilder errorResponse = new StringBuilder();
+            String line;
+            while ((line = reader.readLine()) != null) {
+                errorResponse.append(line.trim());
+            }
+
+            System.out.println("Error Response: " + errorResponse.toString());
+            JSONObject errorBody = new JSONObject(errorResponse.toString());
+            String errorMessage = errorBody.getString("message");
+
+            // Hiển thị thông báo lỗi
+            JOptionPane.showMessageDialog(null, errorMessage, "Error", JOptionPane.ERROR_MESSAGE);
+            return false;
+        } catch (Exception e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(null, "Đã xảy ra lỗi khi xử lý phản hồi lỗi.", "Error", JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
+    }
+
 }

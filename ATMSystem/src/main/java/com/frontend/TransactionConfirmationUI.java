@@ -115,15 +115,17 @@ public class TransactionConfirmationUI extends JFrame {
                         message + " New Balance: " + df.format(balanceValue),
                         "Success",
                         JOptionPane.INFORMATION_MESSAGE
-                );
 
+                );
+                new TransactionsUI(accountNumber,authToken).setVisible(true);
+                dispose();
             } else {
                 // Xử lý các phản hồi không thành công
                 handleErrorResponse(response);
             }
         } catch (HttpClientErrorException ex) {
             // Xử lý lỗi HttpClientErrorException khi nhận phản hồi lỗi từ backend
-            handleHttpClientErrorException(ex);
+            handleHttpClientException(ex);
         } catch (Exception ex) {
             // Xử lý các lỗi khác
             ex.printStackTrace();
@@ -134,8 +136,6 @@ public class TransactionConfirmationUI extends JFrame {
                     JOptionPane.ERROR_MESSAGE
             );
         }
-
-
     }
 
     private void handleErrorResponse(ResponseEntity<String> response) {
@@ -163,17 +163,16 @@ public class TransactionConfirmationUI extends JFrame {
         }
     }
 
-    private void handleHttpClientErrorException(HttpClientErrorException ex) {
+    private void handleHttpClientException(HttpClientErrorException ex) {
         try {
-            // Parse thông báo lỗi từ HttpClientErrorException
-            JSONObject errorResponse = new JSONObject(ex.getResponseBodyAsString());
-            String errorMessage = errorResponse.getString("message");
+            JSONObject Response = new JSONObject(ex.getResponseBodyAsString());
+            String Message = Response.getString("message");
 
             JOptionPane.showMessageDialog(
                     this,
-                    errorMessage,
-                    "Error",
-                    JOptionPane.ERROR_MESSAGE
+                    Message,
+                    "Success",
+                    JOptionPane.INFORMATION_MESSAGE
             );
 
             new TransactionsUI(accountNumber,authToken).setVisible(true);
