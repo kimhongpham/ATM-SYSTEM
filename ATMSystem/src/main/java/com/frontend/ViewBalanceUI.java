@@ -10,6 +10,8 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import org.json.JSONObject;
 
+import static com.atm.util.Utils.formatCurrency;
+
 public class ViewBalanceUI extends JFrame {
     JLabel l1, l2, l3, l4, accountNumberLabel, fullNameLabel, balanceLabel;
     JButton exitButton;
@@ -99,7 +101,8 @@ public class ViewBalanceUI extends JFrame {
             double balance = Double.parseDouble(response.toString()); // API trả về số dư dạng Double
 
             // Cập nhật giao diện
-            balanceLabel.setText(String.format("%.2f VND", balance));
+//            balanceLabel.setText(String.format("%.2f VND", balance));
+            balanceLabel.setText(formatCurrency(balance));
 
         } catch (Exception e) {
             e.printStackTrace();

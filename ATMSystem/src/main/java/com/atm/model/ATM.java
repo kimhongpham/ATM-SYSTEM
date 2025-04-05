@@ -24,7 +24,7 @@ public class ATM {
     private int cash50;
 
     @Column(name = "total_amount", insertable = false, updatable = false) // Generated column
-    private double totalAmount;
+    private Double totalAmount;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
@@ -111,6 +111,10 @@ public class ATM {
     @PreUpdate
     protected void onUpdate() {
         this.lastUpdated = new Date(); // Cập nhật thời gian khi có thay đổi
+    }
+
+    public void setTotalAmount(double totalAmount) {
+        this.totalAmount = totalAmount;
     }
 
     @Override

@@ -1,7 +1,9 @@
 package com.atm.controller;
 
+import com.atm.model.ATMStatus;
 import com.atm.model.Account;
 import com.atm.model.User;
+import com.atm.service.ATMService;
 import com.atm.service.AccountService;
 import com.atm.service.TransactionService;
 import com.atm.service.UserService;
@@ -14,6 +16,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -26,6 +29,9 @@ public class BackOfficeController {
     private TransactionService transactionService;
     @Autowired
     private AccountService accountService;
+
+    @Autowired
+    private ATMService atmService;
 
     @GetMapping("/admin")
     public String viewAdminPage(Model model) {
@@ -77,4 +83,37 @@ public class BackOfficeController {
         model.addAttribute("content", "fragments/account");
         return "index";
     }
+
+    @GetMapping("/admin/atm")
+    public ResponseEntity<Map<Integer,Integer>> getATMCash() {
+        Map<Integer,Integer> map = new HashMap<>();
+        map = atmService.getCashInATM();
+        return new ResponseEntity<>(map, HttpStatus.OK);
+    }
+
+    @PostMapping("/admin/atm")
+    public ResponseEntity<HttpStatus> updateATMCash(@RequestBody Map<Integer,Integer> map) {
+        atmService.updateATMCash(map);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PostMapping("/admin/atmstatus")
+    public ResponseEntity<HttpStatus> updateATMStatus(@RequestBody Map<String,String> map) {
+        ATMStatus atmStatus = ATMStatus.valueOf(map.get("status"));
+        atmService.updateATMStatus(atmStatus);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @GetMapping("/admin/atmstatus")
+    public ResponseEntity<ATMStatus> getATMStatus() {
+
+        ATMStatus status = atmService.getATMStatus();
+
+        if (status != null) {
+            return new ResponseEntity<>(status, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
 }

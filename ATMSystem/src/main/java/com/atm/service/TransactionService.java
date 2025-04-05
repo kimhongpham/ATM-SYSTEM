@@ -30,6 +30,7 @@ public class TransactionService {
     private final CredentialService credentialService;
     private final BalanceService balanceService;
     private final UserRepository userRepository;
+    private final ATMService ATMService;
 
     private static final Logger logger = LoggerFactory.getLogger(TransactionService.class);
 
@@ -41,13 +42,15 @@ public class TransactionService {
                               JwtUtil jwtUtil,
                               CredentialService credentialService,
                               BalanceService balanceService,
-                              UserRepository userRepository) {  // Inject passwordEncoder vào constructor
+                              UserRepository userRepository,
+                              ATMService atmService) {  // Inject passwordEncoder vào constructor
         this.accountRepository = accountRepository;
         this.transactionRepository = transactionRepository;
         this.jwtUtil = jwtUtil;
         this.credentialService=credentialService;
         this.balanceService=balanceService;
         this.userRepository = userRepository;
+        this.ATMService = atmService;
     }
 
     // 📌 Đăng nhập và trả về token JWT
@@ -112,15 +115,18 @@ public class TransactionService {
             return new ApiResponse<>("Insufficient balance to make transaction", null);
         }
 
+        // Trừ số tiền trong ATM
+        double realWithdrawnCash= ATMService.withdraw(amount);
+
         // Tạo DTO để cập nhật số dư
         AccountDTO withdrawalDTO = new AccountDTO();
-        withdrawalDTO.setBalance(amount);
+        withdrawalDTO.setBalance(realWithdrawnCash);
         balanceService.updateBalance(withdrawalDTO, account, TransactionType.WITHDRAWAL);
 
         // Lưu giao dịch
         Transaction transaction = new Transaction(
                 account.getAccountNumber(),
-                amount,
+                realWithdrawnCash,
                 TransactionType.WITHDRAWAL,
                 new Date()
         );

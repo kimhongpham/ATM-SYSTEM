@@ -108,12 +108,15 @@ public class TransactionConfirmationUI extends JFrame {
                 double balanceValue = Double.parseDouble(balance);
                 DecimalFormat df = new DecimalFormat("#,##0.00");
 
+                new TransactionsUI(accountNumber,authToken).setVisible(true);
+                dispose();
                 JOptionPane.showMessageDialog(
                         this,
                         message + " New Balance: " + df.format(balanceValue),
                         "Success",
                         JOptionPane.INFORMATION_MESSAGE
                 );
+
             } else {
                 // Xử lý các phản hồi không thành công
                 handleErrorResponse(response);
@@ -131,6 +134,8 @@ public class TransactionConfirmationUI extends JFrame {
                     JOptionPane.ERROR_MESSAGE
             );
         }
+
+
     }
 
     private void handleErrorResponse(ResponseEntity<String> response) {
@@ -145,6 +150,8 @@ public class TransactionConfirmationUI extends JFrame {
                     "Error",
                     JOptionPane.ERROR_MESSAGE
             );
+            new TransactionsUI(accountNumber,authToken).setVisible(true);
+            dispose();
         } catch (Exception ex) {
             // Lỗi khi parse thông báo lỗi từ backend
             JOptionPane.showMessageDialog(
@@ -168,6 +175,9 @@ public class TransactionConfirmationUI extends JFrame {
                     "Error",
                     JOptionPane.ERROR_MESSAGE
             );
+
+            new TransactionsUI(accountNumber,authToken).setVisible(true);
+            dispose();
         } catch (Exception parseException) {
             // Xử lý lỗi khi không thể parse thông báo lỗi
             JOptionPane.showMessageDialog(
