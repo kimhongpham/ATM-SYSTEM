@@ -193,39 +193,90 @@ public class LoginUI extends JFrame {
             }
 
             int responseCode = connection.getResponseCode();
+
             if (responseCode == HttpURLConnection.HTTP_OK) {
-                BufferedReader br = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-                StringBuilder response = new StringBuilder();
-                String output;
-                while ((output = br.readLine()) != null) {
-                    response.append(output);
-                }
-                br.close();
-                connection.disconnect();
-
-                JSONObject jsonResponse = new JSONObject(response.toString());
-                String authToken = jsonResponse.getString("token");
-
-                //JOptionPane.showMessageDialog(null, "Login Successful!");
-
-
-
-                //Hiển thị UI theo role
-                if (jsonResponse.getString("role").equals("ADMIN")) {
-                    new AdminMenu(accountNumber,authToken).setVisible(true);
-                    dispose();
-                }else if (currentStatus == ATMStatus.ACTIVE) {
-                    new TransactionsUI(accountNumber, authToken).setVisible(true); // Truyền token
-                    dispose();
-                } else JOptionPane.showMessageDialog(null, "ATM này đang không hoạt động!", "ATM OOS", JOptionPane.ERROR_MESSAGE);
-
+                // Xử lý đăng nhập thành công
+                handleSuccessfulLogin(connection, accountNumber);
             } else {
-                JOptionPane.showMessageDialog(null, "Invalid Account Number or PIN", "Login Failed", JOptionPane.ERROR_MESSAGE);
+                // Xử lý các mã lỗi khác nhau
+                handleErrorResponse(connection, responseCode);
             }
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(null, "Error: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, "Connection error: " + e.getMessage(),
+                    "System error", JOptionPane.ERROR_MESSAGE);
             e.printStackTrace();
         }
+    }
+
+    private void handleSuccessfulLogin(HttpURLConnection connection, String accountNumber) throws Exception {
+        BufferedReader br = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+        StringBuilder response = new StringBuilder();
+        String output;
+        while ((output = br.readLine()) != null) {
+            response.append(output);
+        }
+        br.close();
+        connection.disconnect();
+
+        JSONObject jsonResponse = new JSONObject(response.toString());
+        String authToken = jsonResponse.getString("token");
+        String role = jsonResponse.getString("role");
+
+        if (role.equals("ADMIN")) {
+            new AdminMenu(accountNumber, authToken).setVisible(true);
+            dispose();
+        } else if (currentStatus == ATMStatus.ACTIVE) {
+            new TransactionsUI(accountNumber, authToken).setVisible(true);
+            dispose();
+        } else {
+            JOptionPane.showMessageDialog(null, "This ATM is not working!",
+                    "ATM OOS", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private void handleErrorResponse(HttpURLConnection connection, int responseCode) throws Exception {
+        String errorMessage = "Login failed";
+
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(connection.getErrorStream()))) {
+            StringBuilder errorResponse = new StringBuilder();
+            String line;
+            while ((line = br.readLine()) != null) {
+                errorResponse.append(line);
+            }
+
+            // Phân tích phản hồi lỗi từ server nếu có
+            if (errorResponse.length() > 0) {
+                try {
+                    JSONObject errorJson = new JSONObject(errorResponse.toString());
+                    errorMessage = errorJson.optString("message", errorMessage);
+                } catch (Exception e) {
+                    errorMessage = errorResponse.toString();
+                }
+            }
+        }
+
+        // Tùy chỉnh thông báo dựa trên mã lỗi
+        switch (responseCode) {
+            case HttpURLConnection.HTTP_UNAUTHORIZED:
+                errorMessage = "Incorrect account number or PIN";
+                break;
+            case HttpURLConnection.HTTP_FORBIDDEN:
+                if (errorMessage.equals("Login failed")) {
+                    errorMessage = "Account locked or no access";
+                }
+                break;
+            case HttpURLConnection.HTTP_NOT_FOUND:
+                errorMessage = "Account does not exist";
+                break;
+            case HttpURLConnection.HTTP_BAD_REQUEST:
+                errorMessage = "Invalid request";
+                break;
+        }
+
+        JOptionPane.showMessageDialog(null, errorMessage,
+                "Login error (" + responseCode + ")",
+                JOptionPane.ERROR_MESSAGE);
+        connection.disconnect();
     }
 
     private void clearFields() {

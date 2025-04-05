@@ -59,6 +59,12 @@ public class TransactionService {
 
         if (accountOpt.isPresent()) {
             Account account = accountOpt.get();
+
+            // Kiểm tra trạng thái tài khoản
+            if (account.getStatus() != AccountStatus.ACTIVE) {
+                throw new RuntimeException(getAccountStatusMessage(account.getStatus()));
+            }
+
             Credential credential = account.getCredential();
 
             if (credential != null && credentialService.validatePIN(pin, credential.getPin())) {  // So sánh pin với Credential
@@ -178,6 +184,12 @@ public class TransactionService {
 
         Account targetAccount = targetAccountOpt.get();
 
+        // Kiểm tra trạng thái tài khoản đích
+        if (targetAccount.getStatus() != AccountStatus.ACTIVE) {
+            return new ApiResponse<>("Cannot transfer to recipient account: " +
+                    getAccountStatusMessage(targetAccount.getStatus()), null);
+        }
+
         // Tạo DTO để trừ tiền tài khoản nguồn
         AccountDTO transferSourceDTO = new AccountDTO();
         transferSourceDTO.setBalance(amount);
@@ -212,7 +224,8 @@ public class TransactionService {
             return new ApiResponse<>("Unable to save transaction to database", null);
         }
 
-        return new ApiResponse<>("Transfer successful", String.format("%.2f", sourceAccount.getBalance()));    }
+        return new ApiResponse<>("Transfer successful", String.format("%.2f", sourceAccount.getBalance()));
+    }
 
     // Lưu thông tin tạm thời trong session
     private Map<String, String> sessionStorage = new HashMap<>();
@@ -322,45 +335,45 @@ public class TransactionService {
         try {
             transactions = transactionRepository.findByAccountNumber(accountNumber);
         } catch (DataAccessException e) {
-            System.err.println("Lỗi cơ sở dữ liệu: " + e.getMessage());
-            return new ApiResponse<>("Lỗi khi truy xuất lịch sử giao dịch từ cơ sở dữ liệu", null);
+            System.err.println("Database error: " + e.getMessage());
+            return new ApiResponse<>("Error retrieving transaction history from database", null);
         } catch (Exception e) {
-            System.err.println("Lỗi không xác định: " + e.getMessage());
-            return new ApiResponse<>("Lỗi không xác định xảy ra", null);
+            System.err.println("Unknown error: " + e.getMessage());
+            return new ApiResponse<>("An unknown error occurred", null);
         }
 
         // Kiểm tra nếu không có giao dịch nào
         if (transactions == null || transactions.isEmpty()) {
-            return new ApiResponse<>("Không tìm thấy lịch sử giao dịch nào cho tài khoản này", null);
+            return new ApiResponse<>("No transaction history found for this account", null);
         }
 
         // Trả kết quả
-        return new ApiResponse<>("Lịch sử giao dịch", transactions);
+        return new ApiResponse<>("Transaction history", transactions);
     }
 
     public  ApiResponse<List<Transaction>> getTransactionHistoryByUser(String userId) {
         if (userId == null || userId.isEmpty()) {
-            return new ApiResponse<>("Input không hợp lệ", null);
+            return new ApiResponse<>("Invalid input", null);
         }
 
         List<Transaction> transactions;
         try {
             transactions = transactionRepository.findByUserId(userId);
         } catch (DataAccessException e) {
-            System.err.println("Lỗi cơ sở dữ liệu: " + e.getMessage());
-            return new ApiResponse<>("Lỗi khi truy xuất lịch sử giao dịch từ cơ sở dữ liệu", null);
+            System.err.println("Database error: " + e.getMessage());
+            return new ApiResponse<>("Error retrieving transaction history from database", null);
         } catch (Exception e) {
-            System.err.println("Lỗi không xác định: " + e.getMessage());
-            return new ApiResponse<>("Lỗi không xác định xảy ra", null);
+            System.err.println("Unknown error: " + e.getMessage());
+            return new ApiResponse<>("An unknown error occurred", null);
         }
 
         // Kiểm tra nếu không có giao dịch nào
         if (transactions == null || transactions.isEmpty()) {
-            return new ApiResponse<>("Không tìm thấy lịch sử giao dịch nào cho tài khoản này", null);
+            return new ApiResponse<>("No transaction history found for this account", null);
         }
 
         // Trả kết quả
-        return new ApiResponse<>("Lịch sử giao dịch", transactions);
+        return new ApiResponse<>("Transaction history", transactions);
     }
 
     public void logout(String token) {
@@ -371,5 +384,20 @@ public class TransactionService {
 
     public boolean isTokenBlacklisted(String token) {
         return token != null && blacklistedTokens.contains(token);
+    }
+
+    private String getAccountStatusMessage(AccountStatus status) {
+        switch (status) {
+            case BLOCKED:
+                return "Account is blocked. Please contact customer support";
+            case CLOSED:
+                return "Account is closed and no longer active";
+            case FROZEN:
+                return "Account is frozen. Please contact customer support";
+            case PENDING:
+                return "Account is not yet activated";
+            default:
+                return "Account is not in active status";
+        }
     }
 }

@@ -134,20 +134,20 @@ public class DepositUI extends JFrame {
                         String formattedBalance = df.format(balanceValue);
 
                         // Hiển thị thông báo thành công
-                        JOptionPane.showMessageDialog(null, message + " Số dư mới: " + formattedBalance, "Thành công", JOptionPane.INFORMATION_MESSAGE);
+                        JOptionPane.showMessageDialog(null, message + " New balance: " + formattedBalance, "Success", JOptionPane.INFORMATION_MESSAGE);
                         navigateToTransactions(); // Điều hướng sau khi nạp tiền thành công
                     } else {
                         handleResponse(conn); // Xử lý lỗi chi tiết từ server
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
-                    JOptionPane.showMessageDialog(null, "Đã xảy ra lỗi khi xử lý nạp tiền: " + e.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(null, "An error occurred while processing the deposit.: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
                 }
             } catch (NumberFormatException e) {
-                JOptionPane.showMessageDialog(null, "Vui lòng nhập một số tiền hợp lệ", "Lỗi nhập liệu", JOptionPane.WARNING_MESSAGE);
+                JOptionPane.showMessageDialog(null, "Please enter a valid amount", "Input error", JOptionPane.WARNING_MESSAGE);
             }
         } else {
-            JOptionPane.showMessageDialog(null, "Trường số tiền không được để trống", "Lỗi nhập liệu", JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(null, "The amount field cannot be left blank", "Input error", JOptionPane.WARNING_MESSAGE);
         }
     }
 
