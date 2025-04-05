@@ -29,7 +29,7 @@ public class Account {
     @JsonIgnore
     private AccountStatus status;
 
-    @Column(name = "full_name", length = 100, nullable = false)
+    @Transient
     private String fullName;
 
     @Column(name = "last_updated")
