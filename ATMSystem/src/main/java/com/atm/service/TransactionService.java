@@ -125,7 +125,7 @@ public class TransactionService {
 
         // Lưu giao dịch
         Transaction transaction = new Transaction(
-                account.getAccountNumber(),
+                account,
                 realWithdrawnCash,
                 TransactionType.WITHDRAWAL,
                 new Date()
@@ -150,7 +150,7 @@ public class TransactionService {
 
         // Lưu giao dịch
         Transaction transaction = new Transaction(
-                account.getAccountNumber(),
+                account,
                 amount,
                 TransactionType.DEPOSIT,
                 new Date()
@@ -190,14 +190,14 @@ public class TransactionService {
 
         // Lưu giao dịch
         Transaction transactionSource = new Transaction(
-                sourceAccount.getAccountNumber(),
+                sourceAccount,
                 amount,
                 TransactionType.TRANSFER,
                 new Date()
         );
 
         Transaction transactionTarget = new Transaction(
-                targetAccount.getAccountNumber(),
+                targetAccount,
                 amount,
                 TransactionType.DEPOSIT,
                 new Date()
@@ -292,7 +292,7 @@ public class TransactionService {
 
         // Lưu giao dịch
         Transaction transaction = new Transaction(
-                accountNumber,
+                account,
                 request.getAmount(),
                 TransactionType.fromString("WITHDRAWAL_OTP"),
                 new Date()

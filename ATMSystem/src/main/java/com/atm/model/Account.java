@@ -3,6 +3,8 @@ package com.atm.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "Account")
@@ -49,6 +51,12 @@ public class Account {
     @OneToOne(mappedBy = "account", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
     private Balance balanceEntity;
+
+
+    @OneToMany(mappedBy = "accountNumber", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Transaction> transactions = new ArrayList<>();
+
+
 
     // ✅ Constructor không tham số (BẮT BUỘC cho JPA)
     public Account() {}
@@ -133,6 +141,10 @@ public class Account {
 
     public double getBalance() {
         return (balanceEntity != null) ? balanceEntity.getBalance() : 0.0;
+    }
+
+    public List<Transaction> getTransactions() {
+        return transactions;
     }
 
     public void setBalance(double balance) {

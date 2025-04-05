@@ -13,12 +13,14 @@ public class Transaction {
     @Column(name = "transaction_id", length = 50)
     private String transactionId;
 
-    @Column(name = "atm_id", length = 50, nullable = false)
-    private String atmId;
+    @ManyToOne
+    @JoinColumn(name = "atm_id")
+    private ATM atmId;
 
-    @Column(name = "account_number", length = 50, nullable = false)
     @NotNull(message = "Account number is mandatory")
-    private String accountNumber;
+    @ManyToOne
+    @JoinColumn(name = "account_number")
+    private Account accountNumber;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "type", nullable = false)
@@ -35,7 +37,7 @@ public class Transaction {
     public Transaction() {}
 
     // ✅ Constructor đầy đủ
-    public Transaction(String transactionId, String atmId, String accountNumber, String type, double amount) {
+    public Transaction(String transactionId, ATM atmId, Account accountNumber, String type, double amount) {
         this.transactionId = transactionId;
         this.atmId = atmId;
         this.accountNumber = accountNumber;
@@ -45,9 +47,10 @@ public class Transaction {
     }
 
     // ✅ Constructor theo yêu cầu (accountNumber, amount, type, createAt)
-    public Transaction(String accountNumber, double amount, TransactionType type, Date createAt) {
+    public Transaction(Account accountNumber, double amount, TransactionType type, Date createAt) {
         this.transactionId = java.util.UUID.randomUUID().toString(); // Tạo ID ngẫu nhiên
-        this.atmId = "ATM001"; // Có thể thay đổi nếu cần
+        this.atmId = new ATM();
+        this.atmId.setAtmId(1L);
         this.accountNumber = accountNumber;
         this.amount = amount;
         this.type = type;
@@ -63,24 +66,24 @@ public class Transaction {
         this.transactionId = transactionId;
     }
 
-    public String getAtmId() {
-        return atmId;
+    public TransactionType getType() {
+        return type;
     }
 
-    public void setAtmId(String atmId) {
-        this.atmId = atmId;
-    }
-
-    public String getAccountNumber() {
+    public Account getAccountNumber() {
         return accountNumber;
     }
 
-    public void setAccountNumber(String accountNumber) {
+    public void setAccountNumber(Account accountNumber) {
         this.accountNumber = accountNumber;
     }
 
-    public TransactionType getType() {
-        return type;
+    public ATM getAtmId() {
+        return atmId;
+    }
+
+    public void setAtmId(ATM atmId) {
+        this.atmId = atmId;
     }
 
     // ✅ Ràng buộc cho type

@@ -1,15 +1,18 @@
 package com.atm.model;
 
 import jakarta.persistence.*;
+
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table(name = "ATM")
 public class ATM {
 
     @Id
-    @Column(name = "atm_id", length = 50, updatable = false, nullable = false)
-    private String atmId;
+    @Column(name = "atm_id")
+    private Long atmId = 1L;
 
     @Column(name = "cash_500", nullable = false)
     private int cash500;
@@ -34,6 +37,9 @@ public class ATM {
     @Column(name = "last_updated", nullable = false)
     private Date lastUpdated;
 
+    @OneToMany(mappedBy = "atmId", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Transaction> transactions = new ArrayList<>();
+
     // No-arg constructor (Hibernate cần)
     public ATM() {
         this.lastUpdated = new Date(); // Mặc định thời gian cập nhật
@@ -56,8 +62,16 @@ public class ATM {
     }
 
     // Getters and Setters
-    public String getAtmId() {
+    public Long getAtmId() {
         return atmId;
+    }
+
+    public void setAtmId(Long atmId) {
+        this.atmId = atmId;
+    }
+
+    public void setTotalAmount(Double totalAmount) {
+        this.totalAmount = totalAmount;
     }
 
     public int getCash500() {
@@ -102,6 +116,10 @@ public class ATM {
 
     public void setStatus(ATMStatus status) {
         this.status = status;
+    }
+
+    public List<Transaction> getTransactions() {
+        return transactions;
     }
 
     public Date getLastUpdated() {

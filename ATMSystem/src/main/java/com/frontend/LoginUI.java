@@ -1,5 +1,7 @@
 package com.frontend;
 
+import com.atm.model.ATM;
+import com.atm.model.ATMStatus;
 import org.json.JSONObject;
 
 import javax.swing.*;
@@ -11,25 +13,53 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.Scanner;
+import java.util.HashMap;
+import java.util.Map;
 
 public class LoginUI extends JFrame {
-    private JLabel l1, l2, l3;
+    private JLabel l1, l2, l3, atmStatus;
     private JTextField accountNum;
     private JPasswordField passwordText;
     private JButton btnSignIn, btnClear, btnOTP;
 
+    private Map<ATMStatus, String> statusLabel;
+    private ATMStatus currentStatus;
+
     public LoginUI() {
+
+        statusLabel = new HashMap<ATMStatus, String>();
+        statusLabel.put(ATMStatus.valueOf("ACTIVE"),"Đang hoạt động");
+        statusLabel.put(ATMStatus.valueOf("OUTOFSERVICE"),"Tạm dừng hoạt động");
+        statusLabel.put(ATMStatus.valueOf("MAINTENANCE"),"Đang bảo trì");
+        statusLabel.put(ATMStatus.valueOf("LOWCASH"),"Cần tiếp quỹ");
+
         setTitle("LOGIN ACCOUNT");
+        setLocationRelativeTo(null);
         initializeComponents();
         addComponentsToFrame();
         addActionListeners();
         configureFrame();
+
     }
 
     private void initializeComponents() {
         l1 = new JLabel("WELCOME TO ATM");
         l1.setFont(new Font("Osward", Font.BOLD, 32));
+        l1.setHorizontalAlignment(SwingConstants.CENTER);
+        atmStatus = new JLabel();
+        atmStatus.setFont(new Font("Raleway", Font.BOLD, 25));
+        atmStatus.setHorizontalAlignment(SwingConstants.CENTER);
+
+        ATMStatus status = ATMStatus.valueOf(getATMStatus().replace("\"", ""));
+        currentStatus = status ;
+        atmStatus.setText(statusLabel.get(status));
+
+        if (status == ATMStatus.ACTIVE) {
+            atmStatus.setForeground(Color.GREEN);
+        }else {
+            atmStatus.setForeground(Color.RED);
+        }
+
 
         l2 = new JLabel("Account Number:");
         l2.setFont(new Font("Raleway", Font.BOLD, 22));
@@ -48,6 +78,8 @@ public class LoginUI extends JFrame {
 
         btnClear = new JButton("Clear");
         btnClear.setFont(new Font("Arial", Font.BOLD, 20));
+
+
 //
 //        btnOTP = new JButton("Withdraw by OTP");
 //        btnOTP.setFont(new Font("Arial", Font.BOLD, 20));
@@ -56,7 +88,7 @@ public class LoginUI extends JFrame {
     private void addComponentsToFrame() {
         setLayout(null);
 
-        l1.setBounds(200, 50, 450, 40);
+        l1.setBounds(100, 50, 450, 40);
         add(l1);
 
         l2.setBounds(100, 175, 300, 30);
@@ -79,6 +111,11 @@ public class LoginUI extends JFrame {
 
 //        btnOTP.setBounds(200, 420, 300, 50);
 //        add(btnOTP);
+
+        atmStatus.setBounds(100, 100, 450, 30);
+        add(atmStatus);
+
+
     }
 
     private void addActionListeners() {
@@ -102,6 +139,40 @@ public class LoginUI extends JFrame {
 //            }
 //        });
     }
+
+    private String getATMStatus() {
+        try {
+            // URL của API
+            URL url = new URL("http://localhost:8080/atmstatus");
+
+            // Mở kết nối HTTP
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
+            connection.setRequestProperty("Accept", "application/json");
+
+            // Kiểm tra phản hồi HTTP
+            int responseCode = connection.getResponseCode();
+            if (responseCode == 200) { // HTTP OK
+                BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                StringBuilder response = new StringBuilder();
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    response.append(line);
+                }
+                reader.close();
+
+                // Trả về nội dung phản hồi từ API
+                return response.toString();
+            } else {
+                return "Error: " + responseCode;
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "Error: Unable to fetch ATM status.";
+        }
+    }
+
 
     private void handleLogin() {
         String accountNumber = accountNum.getText();
@@ -135,16 +206,19 @@ public class LoginUI extends JFrame {
                 JSONObject jsonResponse = new JSONObject(response.toString());
                 String authToken = jsonResponse.getString("token");
 
-                JOptionPane.showMessageDialog(null, "Login Successful!");
+                //JOptionPane.showMessageDialog(null, "Login Successful!");
 
 
 
                 //Hiển thị UI theo role
                 if (jsonResponse.getString("role").equals("ADMIN")) {
                     new AdminMenu(accountNumber,authToken).setVisible(true);
-                }else new TransactionsUI(accountNumber, authToken).setVisible(true); // Truyền token
+                    dispose();
+                }else if (currentStatus == ATMStatus.ACTIVE) {
+                    new TransactionsUI(accountNumber, authToken).setVisible(true); // Truyền token
+                    dispose();
+                } else JOptionPane.showMessageDialog(null, "ATM này đang không hoạt động!", "ATM OOS", JOptionPane.ERROR_MESSAGE);
 
-                dispose();
             } else {
                 JOptionPane.showMessageDialog(null, "Invalid Account Number or PIN", "Login Failed", JOptionPane.ERROR_MESSAGE);
             }
