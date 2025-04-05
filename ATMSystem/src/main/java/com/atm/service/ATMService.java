@@ -117,9 +117,14 @@ public class ATMService {
                     + ATMInfo.getCash100()*denominations[2]
                     + ATMInfo.getCash50() * denominations[3];
 
+
             ATMInfo.setTotalAmount(totalAmount);
+            if (totalAmount < 10000000) ATMInfo.setStatus(ATMStatus.LOWCASH);
+            if (totalAmount < 50000) ATMInfo.setStatus(ATMStatus.OUTOFSERVICE);
             atmRepository.save(ATMInfo);
         }
+
+
         int roundedAmount = (int) amount;
         return (double) roundedAmount;
     }
