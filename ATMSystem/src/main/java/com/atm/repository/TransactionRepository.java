@@ -8,6 +8,8 @@ import org.springframework.data.jpa.repository.Query;
 
 public interface TransactionRepository extends JpaRepository<Transaction, Long> {
 
+    @Query(value = "SELECT t.transaction_id, t.atm_id, t.account_number, t.type, t.amount, t.create_at FROM Transaction t INNER JOIN Account ac ON ac.account_number = t.account_number WHERE ac.account_number = ?1",
+            nativeQuery = true)
     List<Transaction> findByAccountNumber(String accountNumber);
 
     @Query(value = "SELECT t.transaction_id, t.atm_id, t.account_number, t.type, t.amount, t.create_at FROM Transaction t INNER JOIN Account ac ON ac.account_number = t.account_number INNER JOIN User u ON u.user_id = ac.user_id WHERE u.user_id = ?1",

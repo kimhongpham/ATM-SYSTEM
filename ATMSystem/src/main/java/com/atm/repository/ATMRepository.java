@@ -11,6 +11,7 @@ public interface ATMRepository extends JpaRepository<ATM, Long> {
         return findById(1L).orElseThrow(() -> new RuntimeException("No ATM found."));
     }
 
+
 //    // Lấy trạng thái của ATM
 //    default String findATMStatus() {
 //        return findATM().getStatus();

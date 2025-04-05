@@ -1,9 +1,8 @@
 package com.atm;
 
 import com.atm.dto.AccountDTO;
-import com.atm.model.Account;
-import com.atm.model.AccountType;
-import com.atm.model.User;
+import com.atm.model.*;
+import com.atm.repository.ATMRepository;
 import com.atm.service.AccountService;
 import com.atm.repository.UserRepository; // Import UserRepository
 import org.slf4j.Logger;
@@ -13,11 +12,11 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import com.atm.model.AccountStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Date;
+import java.util.Optional;
 
 @SpringBootApplication(scanBasePackages = "com.atm")
 @EnableJpaRepositories(basePackages = "com.atm.repository") // Đảm bảo quét các repository
@@ -36,8 +35,10 @@ public class Main {
             // Lấy instance UserRepository từ Spring context
             UserRepository userRepository = context.getBean(UserRepository.class);
 
+            ATMRepository atmRepository = context.getBean(ATMRepository.class);
+
             // Gọi phương thức khởi tạo tài khoản admin
-            initializeAdminAccount(context.getBean(AccountService.class), userRepository);
+            initializeAdminAccount(context.getBean(AccountService.class), userRepository, atmRepository);
 
             logger.info("ATM System started successfully.");
         } catch (Exception e) {
@@ -45,7 +46,7 @@ public class Main {
         }
     }
 
-    private static void initializeAdminAccount(AccountService accountService, UserRepository userRepository) {
+    private static void initializeAdminAccount(AccountService accountService, UserRepository userRepository, ATMRepository atmRepository) {
         logger.info("Starting admin account initialization...");
 
         User existingUser = userRepository.findByEmail("admin@example.com");
@@ -76,6 +77,22 @@ public class Main {
             Account account = adminDTO.toAccount(userRepository);
             accountService.createAccount(account);
             logger.info("Admin account has been created successfully!");
+
+            // Tạo ATM mặc định
+            Optional<ATM> currentATM = atmRepository.findById(1L);
+            if (!currentATM.isPresent()) {
+                ATM atm = new ATM();
+                atm.setAtmId(1L);
+                atm.setCash200(10);
+                atm.setCash50(10);
+                atm.setCash100(10);
+                atm.setCash500(10);
+                atm.setTotalAmount(8500000);
+                atm.setStatus(ATMStatus.ACTIVE);
+                atmRepository.save(atm);
+                logger.info("ATM has been created successfully!");
+            }
+
         } else {
             logger.info("Admin user already exists, skipping user creation.");
         }

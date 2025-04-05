@@ -50,6 +50,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/users/{userId}").hasRole("ADMIN")
                         .requestMatchers("/api/transactions/send-otp", "/api/transactions/process-with-otp").permitAll()
                         .requestMatchers("/login", "/css/**", "/js/**","/img/**","/scss/**","/vendor/**").permitAll()
+                        .requestMatchers("/atmstatus").permitAll()
                         .requestMatchers("/admin/**").authenticated()
                         .anyRequest().authenticated()
                 )

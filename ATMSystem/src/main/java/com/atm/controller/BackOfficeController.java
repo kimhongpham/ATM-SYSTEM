@@ -116,4 +116,16 @@ public class BackOfficeController {
         }
     }
 
+    @GetMapping("/atmstatus")
+    public ResponseEntity<ATMStatus> getPublicATMStatus() {
+
+        ATMStatus status = atmService.getATMStatus();
+
+        if (status != null) {
+            return new ResponseEntity<>(status, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
 }

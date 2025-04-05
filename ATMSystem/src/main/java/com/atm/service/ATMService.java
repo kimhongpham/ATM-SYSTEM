@@ -44,7 +44,7 @@ public class ATMService {
         Map<Integer,Integer> cashInATM = new HashMap<>();
 
         //Lấy thông tin lượng tiền từ ATM
-        Optional<ATM> ATMInfo = atmRepository.findById((long) 1);
+        Optional<ATM> ATMInfo = atmRepository.findById(1L);
         if (ATMInfo.isPresent()) {
             ATM currentATM = ATMInfo.get();
 
@@ -59,7 +59,7 @@ public class ATMService {
     }
 
     public void updateATMCash(Map<Integer,Integer> cashInATM){
-        ATM atm = atmRepository.findById((long) 1).get();
+        ATM atm = atmRepository.findById(1L).get();
         atm.setCash500(cashInATM.get(denominations[0]));
         atm.setCash200(cashInATM.get(denominations[1]));
         atm.setCash100(cashInATM.get(denominations[2]));
@@ -68,13 +68,13 @@ public class ATMService {
     }
 
     public void updateATMStatus(ATMStatus newStatus){
-        ATM atm = atmRepository.findById((long) 1).get();
+        ATM atm = atmRepository.findById(1L).get();
         atm.setStatus(newStatus);
         atmRepository.save(atm);
     }
 
     public ATMStatus getATMStatus(){
-        ATM atm = atmRepository.findById((long) 1).get();
+        ATM atm = atmRepository.findById(1L).get();
         return atm.getStatus();
     }
 

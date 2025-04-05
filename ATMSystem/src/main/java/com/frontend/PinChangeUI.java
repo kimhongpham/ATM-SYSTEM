@@ -130,7 +130,7 @@ public class PinChangeUI extends JFrame {
             int responseCode = conn.getResponseCode();
             if (responseCode == HttpURLConnection.HTTP_OK) {
                 JOptionPane.showMessageDialog(null, "PIN changed successfully!");
-                new TransactionsUI(accountNumber,authToken).setVisible(true);
+                new LoginUI().setVisible(true);
                 dispose();
             } else {
                 // Đọc lỗi từ API
