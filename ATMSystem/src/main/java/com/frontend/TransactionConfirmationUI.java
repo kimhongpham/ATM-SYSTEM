@@ -123,7 +123,7 @@ public class TransactionConfirmationUI extends JFrame {
             }
         } catch (HttpClientErrorException ex) {
             // Xử lý lỗi HttpClientErrorException khi nhận phản hồi lỗi từ backend
-            handleHttpClientErrorException(ex);
+            handleHttpClientException(ex);
         } catch (Exception ex) {
             // Xử lý các lỗi khác
             ex.printStackTrace();
@@ -159,15 +159,14 @@ public class TransactionConfirmationUI extends JFrame {
         }
     }
 
-    private void handleHttpClientErrorException(HttpClientErrorException ex) {
+    private void handleHttpClientException(HttpClientErrorException ex) {
         try {
-            // Parse thông báo lỗi từ HttpClientErrorException
-            JSONObject errorResponse = new JSONObject(ex.getResponseBodyAsString());
-            String errorMessage = errorResponse.getString("message");
+            JSONObject Response = new JSONObject(ex.getResponseBodyAsString());
+            String Message = Response.getString("message");
 
             JOptionPane.showMessageDialog(
                     this,
-                    errorMessage,
+                    Message,
                     "Success",
                     JOptionPane.INFORMATION_MESSAGE
             );

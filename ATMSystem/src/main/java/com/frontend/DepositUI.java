@@ -82,7 +82,7 @@ public class DepositUI extends JFrame {
                 double amount = Double.parseDouble(amountStr);
 
                 if (amount <= 0) {
-                    JOptionPane.showMessageDialog(null, "Please enter an amount greater than 0", "Input Error", JOptionPane.WARNING_MESSAGE);
+                    JOptionPane.showMessageDialog(null, "Vui lòng nhập số tiền lớn hơn 0", "Lỗi nhập liệu", JOptionPane.WARNING_MESSAGE);
                     return;
                 }
 
@@ -96,8 +96,11 @@ public class DepositUI extends JFrame {
                     conn.setRequestProperty("Authorization", "Bearer " + authToken);
                     conn.setDoOutput(true);
 
-                    // Tạo JSON body cho yêu cầu
-                    String jsonBody = String.format("{\"amount\": %.2f}", amount);
+                    // Sử dụng thư viện JSON để tạo JSON body
+                    JSONObject jsonObject = new JSONObject();
+                    jsonObject.put("amount", amount);
+                    String jsonBody = jsonObject.toString();
+
                     System.out.println("Sending JSON Body: " + jsonBody);
                     System.out.println("Authorization Token: " + authToken);
 
@@ -131,20 +134,20 @@ public class DepositUI extends JFrame {
                         String formattedBalance = df.format(balanceValue);
 
                         // Hiển thị thông báo thành công
-                        JOptionPane.showMessageDialog(null, message + " New Balance: " + formattedBalance, "Success", JOptionPane.INFORMATION_MESSAGE);
+                        JOptionPane.showMessageDialog(null, message + " Số dư mới: " + formattedBalance, "Thành công", JOptionPane.INFORMATION_MESSAGE);
                         navigateToTransactions(); // Điều hướng sau khi nạp tiền thành công
                     } else {
-                        handleResponse(conn);
+                        handleResponse(conn); // Xử lý lỗi chi tiết từ server
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
-                    JOptionPane.showMessageDialog(null, "Error processing deposit: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(null, "Đã xảy ra lỗi khi xử lý nạp tiền: " + e.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
                 }
             } catch (NumberFormatException e) {
-                JOptionPane.showMessageDialog(null, "Please enter a valid amount", "Input Error", JOptionPane.WARNING_MESSAGE);
+                JOptionPane.showMessageDialog(null, "Vui lòng nhập một số tiền hợp lệ", "Lỗi nhập liệu", JOptionPane.WARNING_MESSAGE);
             }
         } else {
-            JOptionPane.showMessageDialog(null, "Amount field cannot be empty", "Input Error", JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(null, "Trường số tiền không được để trống", "Lỗi nhập liệu", JOptionPane.WARNING_MESSAGE);
         }
     }
 
@@ -164,12 +167,13 @@ public class DepositUI extends JFrame {
             String Message = ResponseBody.getString("message");
 
             JOptionPane.showMessageDialog(null, Message, "Success", JOptionPane.INFORMATION_MESSAGE);
+            navigateToTransactions();
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null, "Failed to read error response from server. Please try again later.", "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 
-    private void navigateToTransactions() {
+    public void navigateToTransactions() {
         new TransactionsUI(accountNumber,authToken).setVisible(true);  // Quay về màn hình giao dịch
         dispose();
     }
@@ -180,5 +184,6 @@ public class DepositUI extends JFrame {
         setLocation(250, 0);
         setVisible(true);
     }
+
 
 }
