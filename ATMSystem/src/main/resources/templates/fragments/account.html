@@ -135,7 +135,7 @@
                 <form id="addNewForm">
                     <!-- Account Number -->
                     <div class="mb-3">
-                        <label for="accountNumber" class="form-label">Account Number</label>
+                        <label for="accountNumber" class="form-label">Số tài khoản</label>
                         <input type="text" class="form-control" id="accountNumber" name="accountNumber">
                     </div>
                     <!-- Full Name -->
@@ -150,25 +150,25 @@
                     </div>
                     <!-- Account Type -->
                     <div class="mb-3">
-                        <label for="accountType" class="form-label">Account Type</label>
+                        <label for="accountType" class="form-label">Loại tài khoản</label>
                         <select class="form-control" id="accountType">
                             <option value="SAVINGS">Tiết kiệm</option>
                             <option value="CHECKING">Thanh toán</option>
                         </select>
                     </div>
                     <!-- PIN -->
-                    <div class="mb-3">
-                        <label for="pin" class="form-label">PIN</label>
-                        <input type="password" class="form-control" id="pin" name="pin">
-                    </div>
+<!--                    <div class="mb-3">-->
+<!--                        <label for="pin" class="form-label">PIN</label>-->
+<!--                        <input type="password" class="form-control" id="pin" name="pin">-->
+<!--                    </div>-->
                     <!-- Role -->
                     <div class="mb-3">
-                        <label for="role" class="form-label">Role</label>
+                        <label for="role" class="form-label">Vai trò</label>
                         <input type="text" class="form-control" id="role" name="role" readonly value="USER">
                     </div>
                     <!-- Phone -->
                     <div class="mb-3">
-                        <label for="phone" class="form-label">Phone</label>
+                        <label for="phone" class="form-label">Số điện thoại</label>
                         <input type="tel" class="form-control" id="phone" name="phone">
                     </div>
                     <!-- Email -->
@@ -237,7 +237,7 @@
             accountType: document.getElementById('accountType').value,
             // status: null,
             // balance: null,
-            pin: document.getElementById('pin').value,
+            pin: "000000",
             role: document.getElementById('role').value,
             phone: document.getElementById('phone').value,
             email: document.getElementById('email').value,
