@@ -1,70 +1,124 @@
-# Hệ Thống ATM - Kiến Trúc Hướng Dịch Vụ
+# 🏧 ATM System - Service Oriented Architecture
 
-## 📋 Mục Tiêu  
-
-### Đối Với Khách Hàng:
-- Tạo ra hệ thống ATM **thân thiện và dễ sử dụng**.
-- Đảm bảo **bảo mật dữ liệu** thông qua mã hóa.
-- **Nâng cao tốc độ giao dịch** nhằm giảm thời gian xử lý khi rút tiền và chuyển khoản.
-- Hỗ trợ **nhiều phương thức thanh toán**, cho phép rút tiền bằng thẻ hoặc OTP.
-- Cung cấp **dịch vụ 24/7**, giúp khách hàng thực hiện giao dịch mọi lúc, mọi nơi.
+A system that simulates an **ATM (automatic teller/deposit machine)** that helps users perform basic operations such as logging in, checking balances, withdrawing money, depositing money, and viewing transaction history.
 
 ---
 
-## 🔨 Phương Pháp Thực Hiện  
-
-Quá trình phát triển hệ thống ATM được thực hiện theo các bước toàn diện:  
-1. **Phân Tích Yêu Cầu**: Thu thập dữ liệu về các hệ thống ATM hiện tại.  
-2. **Thiết Kế Hệ Thống**: Xây dựng kiến trúc phần mềm dựa trên nguyên lý hướng dịch vụ, xác định các thành phần chính của hệ thống.  
-3. **Triển Khai & Kiểm Thử**: Phát triển hệ thống theo từng module, đảm bảo tính ổn định và bảo mật.  
-4. **Đánh Giá & Tối Ưu**: Kiểm tra hiệu suất, bảo mật và độ tin cậy trước khi đưa hệ thống vào vận hành.  
-
----
-
-## 🏗 Kiến Trúc Được Chọn  
-
-### Vì Sao Chọn Kiến Trúc Hướng Dịch Vụ?
-- Cân bằng giữa **tính linh hoạt, hiệu suất và chi phí**.  
-- Phù hợp với mục tiêu chuyển đổi số của ngân hàng và mô hình ngân hàng vừa và nhỏ.  
-- Hỗ trợ mở rộng hệ sinh thái dịch vụ trong tương lai như **Internet Banking**, **ví điện tử**.
-
-### Phân Tích Trade-Offs:
-
-1. **Service-Based vs. Monolithic**:  
-   - **Ưu Điểm**: Dễ mở rộng các dịch vụ như ngân hàng di động hoặc ví điện tử.  
-   - **Nhược Điểm**: Độ phức tạp cao hơn, tiềm năng độ trễ lớn do giao tiếp qua API.  
-
-2. **Service-Based vs. Microservices**:  
-   - **Ưu Điểm**: Đơn giản và ít tốn kém hơn, dễ quản lý mà không cần DevOps mạnh.  
-   - **Nhược Điểm**: Khả năng linh hoạt và chịu tải thấp hơn khi mở rộng quy mô lớn.  
+## ✨ Main features
+* **Login and authenticate** users with PIN or account.
+* **Check current account balance**.
+* **Withdraw**: select amount, confirm, and update balance.
+* **Deposit** to account.
+* **View transaction history**: display withdrawal/deposit transactions that have been made.
+* **(Optional)**: Transfer money between accounts.
+* **(Optional)**: Change PIN or change account information.
 
 ---
 
-## ⚙️ Công Nghệ  
-
-### Môi Trường Phát Triển:  
-- **Hệ Điều Hành**: Windows 11, macOS  
-- **IDE**: IntelliJ IDEA kết hợp với Spring Boot  
-- **Công Cụ Build**: Gradle 8.3  
-- **Quản Lý Mã Nguồn**: GitHub  
-
-### Công Nghệ:  
-#### Frontend:  
-- Java 21, Spring Boot 3.1, HTML, CSS, SCSS, JavaScript, Bootstrap  
-
-#### Backend:  
-- Java 21, Spring Boot 3.1 (Spring Security, Spring Data JPA)  
-- RESTful API (JSON), xác thực JWT  
-- Database: MySQL 8.0 với giao dịch ACID  
-
-#### Kiểm Tra API:  
-- Postman/Insomnia, HTTP Client trong IntelliJ  
+## 🛠️ Technology used
+| Components | Technology |
+|-------------|------------|
+| **Language** | Java 21+ |
+| **Framework** | Spring Boot |
+| **Security** | Spring Security, JWT |
+| **DB** | MySQL (or H2 for test) |
+| **Build tool** | Gradle |
+| **ORM** | Spring Data JPA |
+| **OTP storage & add-on logic** | Service layer with `OtpService` class |
+| **Global error handling** | `GlobalExceptionHandler` |
 
 ---
 
-## 🌐 Tầm Nhìn Tương Lai  
+## 📂 Directory Structure
+```
+│ Main.java
+│
+├───config
+├───controller
+├───dto
+├───exception
+├───model
+├───repository
+├───service
+└───util
 
-- Chuyển đổi sang **Kiến Trúc Microservices** nếu cần mở rộng mạnh mẽ hệ sinh thái.  
-- Tích hợp các dịch vụ lớn như **ngân hàng di động**, **ví điện tử**, và **hệ thống phát hiện gian lận tiên tiến**.  
+````
 
 ---
+
+## ⚙️ Install and run the project
+
+### 1. Clone repository
+```bash
+git clone https://github.com/kimhongpham/ATM-SYSTEM.git
+cd atm-system
+````
+
+### 2\. Install dependencies
+
+```bash
+./gradlew build
+
+# Or run directly from IDE: click on Gradle icon.
+```
+
+### 3\. Configure environment variables / database connection
+Create database in MySQL:
+```
+CREATE DATABASE atm_system;
+```
+Update file **application.properties** fill in database connection information:
+
+```
+db.url=jdbc:mysql://localhost:3306/atm_db
+db.user=root
+db.password=your_password
+```
+
+### 4\. Run the application
+
+Run the main startup file of the application:
+
+```bash
+./gradlew bootRun
+
+# Or run directly from IDE: open file Main.* and run the application.
+```
+The application will run at:
+👉 http://localhost:8080 to access the account registration website
+-----
+### 5\. Run frontend (Java Swing)
+
+Frontend is written in Java Swing, start directly from class:
+
+src/main/java/com/frontend/LoginUI.java
+
+How to run:
+```bash
+From IDE (IntelliJ / Eclipse):
+Open file LoginUI.java → Run LoginUI.main()
+```
+Or from terminal:
+```bash
+cd src/main/java
+javac com/frontend/LoginUI.java
+java com.frontend.LoginUI
+```
+
+The GUI application will display the login screen (LoginUI), communicate with the backend via REST APIs.
+
+## 🤝 Contribute
+
+We welcome any contribution to improve this ATM system\!
+
+1. Fork this repository.
+2. Create a new feature branch (`git checkout -b feature/TenTinhNang`).
+3. Commit the change (`git commit -m "Add Feature X"`).
+4. Push to your branch (`git push origin feature/TenTinhNang`).
+5. Create a **Pull Request (PR)** and clearly describe the change.
+
+-----
+
+## 📄 License
+
+The project is released under the **MIT** license. See the file [LICENSE](https://www.google.com/search?q=LICENSE) for details.
